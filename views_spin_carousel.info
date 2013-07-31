@@ -1,3 +1,8 @@
 name = Views Spin Carousel
-description = A 3D WebGL-based carousel view.
+description = A 3D CSS3-based carousel view.
 core = 7.x
+package = Views
+dependencies[] = views
+files[] = views_spin_carousel.module
+files[] = views_plugin_style_spin_carousel.inc
+files[] = handlers/views_spin_carousel_handler_field.inc

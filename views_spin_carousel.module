@@ -1,3 +1,64 @@
 <?php
 // This line is so VIM recognizes this as a PHP file:
 // vim:ft=php:shiftwidth=3:tabstop=3:
+
+// views: hook_views_api()
+function views_spin_carousel_views_api() {
+   return array( 'api' => 3.0 );
+}
+
+// views: hook_views_plugins()
+function views_spin_carousel_views_plugins() {
+   return array(
+      'style' => array(
+         'spin_carousel' => array(
+            'title' => t( '3D Spinning Carousel' ),
+            'help' => t( 'Displays a 3D spinning carousel with flipping '.
+               'items on browsers that support it.' ),
+            'handler' => 'views_plugin_style_spin_carousel',
+            'theme' => 'views_spin_carousel',
+            'uses fields' => true,
+            'uses options' => true,
+            'uses grouping' => false,
+            'type' => 'normal',
+            'even empty' => true,
+         ),
+      ),
+   );
+}
+
+// views: hook_views_handlers()
+function views_spin_carousel_handlers() {
+   return array(
+      'info' => array(
+         'path' => drupal_get_path( 'module', 'views_spin_carousel' ).
+            '/handlers',
+      ),
+      'handlers' => array(
+         'views_spin_carousel_handler_field' => array(
+            'parent' => 'views_handler_field_field',
+         ),
+      ),
+   );
+}
+
+// views: hook_views_data_alter()
+function views_spin_carousel_views_data_alter( &$data ) {
+   foreach( $data as $table => $config ) {
+      foreach( $config as $item_key => $item_config ) {
+         if(
+            isset( $item_config['field']['handler'] ) &&
+            'views_handler_field_field' == $item_config['field']['handler']
+         ) {
+            $data[$table][$item_key]['field']['handler'] =
+               'views_spin_carousel_handler_field';
+         }
+      }
+   }
+}
+
+// views: hook_views_pre_render()
+function views_spin_carousel_views_pre_render( &$view ) {
+   //dpm( $view );
+}
+
