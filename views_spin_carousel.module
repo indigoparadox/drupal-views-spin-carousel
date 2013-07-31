@@ -27,38 +27,3 @@ function views_spin_carousel_views_plugins() {
    );
 }
 
-// views: hook_views_handlers()
-function views_spin_carousel_handlers() {
-   return array(
-      'info' => array(
-         'path' => drupal_get_path( 'module', 'views_spin_carousel' ).
-            '/handlers',
-      ),
-      'handlers' => array(
-         'views_spin_carousel_handler_field' => array(
-            'parent' => 'views_handler_field_field',
-         ),
-      ),
-   );
-}
-
-// views: hook_views_data_alter()
-function views_spin_carousel_views_data_alter( &$data ) {
-   foreach( $data as $table => $config ) {
-      foreach( $config as $item_key => $item_config ) {
-         if(
-            isset( $item_config['field']['handler'] ) &&
-            'views_handler_field_field' == $item_config['field']['handler']
-         ) {
-            $data[$table][$item_key]['field']['handler'] =
-               'views_spin_carousel_handler_field';
-         }
-      }
-   }
-}
-
-// views: hook_views_pre_render()
-function views_spin_carousel_views_pre_render( &$view ) {
-   //dpm( $view );
-}
-

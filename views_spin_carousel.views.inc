@@ -4,189 +4,76 @@
 
 function template_preprocess_views_spin_carousel( &$vars ) {
 
-   //dpm( $vars );
-
-   /*
-   $gallery_js = <<<EOF
-jQuery(document).ready( function() {
-   // TODO: Add view ID to selectors.
-   jQuery('.view-id-{$vars['view']->name} div.iygallery-slides').cycle( { 
-      'fx': '{$vars['options']['slide_transition']}', 
-      'timeout': {$vars['options']['slide_timeout']}
-   } );
-   jQuery('.view-id-{$vars['view']->name} div.iygallery-thumbs').cycle( { 
-      'fx': 'scrollHorz',
-      'next': 'a.iygallery-thumbs-next',
-      'prev': 'a.iygallery-thumbs-previous',
-      'timeout': 0
-   } );
-} );
-
-EOF;
-
    drupal_add_css(
-      drupal_get_path( 'module', 'irrigableyam' ).'/views-view-iygallery.css'
+      drupal_get_path( 'module', 'views_spin_carousel' ).
+         '/views-spin-carousel.css'
    );
-   drupal_add_js( 
-      libjunk_get_libraries_path( 'jquery.cycle' ).
-         '/jquery.cycle/jquery.cycle.all.min.js',
-      array( 'type' => 'file', 'weight' => 100 )
-   );
-   drupal_add_js(
-      drupal_get_path( 'module', 'irrigableyam' ).'/views-view-iygallery.js',
-      array( 'type' => 'file', 'weight' => 150 )
-   );
-   drupal_add_js(
-      $gallery_js,
-      array( 'type' => 'inline', 'weight' => 155 )
-   );
-
-   global $iygallery_image_markup;
-   global $iygallery_thumb_markup;
-   $iygallery_image_markup = array();
-   $iygallery_thumb_markup = array();
-
-   // Sanity checks.
-   if(
-      'pager' == $vars['view']->query->pager->plugin_type &&
-      0 != $vars['view']->query->pager->options['items_per_page']
-   ) {
-      drupal_set_message(
-         t(
-            'This view requires the pager to be disabled (set to all items '.
-            'per page).'
-         ),
-         'error'
-      );
-   }
-
-   // TODO: Extract the image style from the view and insert dynamic CSS to size
-   //       it.
-
-   $image_styles = image_styles();
-   foreach(
-      $image_styles[$vars['options']['slide_image_style']]['effects'] as
-      $image_effect_iter
-   ) {
-      if( array_key_exists( 'width', $image_effect_iter['data'] ) ) {
-         $vars['options']['size_image']['width'] =
-            $image_effect_iter['data']['width'];
-      }
-      if( array_key_exists( 'height', $image_effect_iter['data'] ) ) {
-         $vars['options']['size_image']['height'] =
-            $image_effect_iter['data']['height'];
-      }
-   }
-   foreach(
-      $image_styles[$vars['options']['slide_thumb_style']]['effects'] as
-      $image_effect_iter
-   ) {
-      if( array_key_exists( 'width', $image_effect_iter['data'] ) ) {
-         $vars['options']['size_thumb']['width'] =
-            $image_effect_iter['data']['width'];
-      }
-      if( array_key_exists( 'height', $image_effect_iter['data'] ) ) {
-         $vars['options']['size_thumb']['height'] =
-            $image_effect_iter['data']['height'];
-      }
-   }
 
    if(
-      !array_key_exists( 'width', $vars['options']['size_image'] ) ||
-      !array_key_exists( 'height', $vars['options']['size_image'] ) ||
-      !array_key_exists( 'width', $vars['options']['size_thumb'] ) ||
-      !array_key_exists( 'height', $vars['options']['size_thumb'] )
+      !is_numeric( $vars['options']['flipper_width'] ) ||
+      !is_numeric( $vars['options']['flipper_height'] )
    ) {
-      drupal_set_message(
-         t( 'A style must define a consistent height and width between images '.
-            'for this view.' ),
-         'error'
-      );
+      // TODO: Error or something?
+      return;
    }
 
-   // Build the rendered image and thumb lists.
-   for( $i = 0 ; $i < count( $vars['rows'] ) ; $i++ ) {
-      // TODO: Check for errors, like the wrong node type.
-      $node_image = node_load( $vars['rows'][$i]->field_images );
-      // TODO: Make sure the image node is visible.
-      $vars['rows'][$i]->field_images = array(
-         'nid' => $vars['rows'][$i]->field_images,
-         'rendered_thumb' => $iygallery_thumb_markup[$i] = theme_image( array(
-            'path' => image_style_url( 
-               $vars['options']['slide_thumb_style'],
-               $node_image
-                  ->irrigableyam_image_field[$node_image->language][0]['uri']
-            ),
-            'alt' => $node_image
-               ->irrigableyam_image_field[$node_image->language][0]['alt'],
-            'title' => $node_image
-               ->irrigableyam_image_field[$node_image->language][0]['title'],
-            'attributes' => array(
-               // XXX: Only show if not null.
-               // 'width' => $thumbnail_size[0],
-               // 'height' => $thumbnail_size[1]
-            ),
-         ) ),
-         'rendered_full' => $iygallery_thumb_markup[$i] = theme_image( array(
-            'path' => image_style_url( 
-               $vars['options']['slide_image_style'],
-               $node_image
-                  ->irrigableyam_image_field[$node_image->language][0]['uri']
-            ),
-            'alt' => $node_image
-               ->irrigableyam_image_field[$node_image->language][0]['alt'],
-            'title' => $node_image
-               ->irrigableyam_image_field[$node_image->language][0]['title'],
-            'attributes' => array(
-               // XXX: Only show if not null.
-               // 'width' => $thumbnail_size[0],
-               // 'height' => $thumbnail_size[1]
-            ),
-         ) ),
-      );
+   $panel_width = $vars['options']['flipper_width'];
+   $panel_height = $vars['options']['flipper_height'];
+   $panel_width_large = $panel_width + 10;
+   $panel_height_large = $panel_height + 10;
 
-      // Clean up for the result.
+   // Get the angles for the main carousel.
+   $panel_count = count( $vars['view']->result );
+   $tilt_inc = 360 / $panel_count;
+   $tilt_z = round( ($panel_width_large / 2) / tan( pi() / $panel_count ) );
 
-      //dpm( $vars['rows'][$i] );
-
-      //dpm( $vars );
-
-      //$vars['view']->query->pager = null;
-   }
-   */
+   // Add what we have so far.
+   $panel_dynamic_css = <<<EOF
+.views-spin-carousel-container-on {
+   width: ${panel_width_large}px !important;
+   height: ${panel_height_large}px !important;
 }
 
-function views_spin_carousel_views_query_alter( &$view, &$query ) {
-   /* $query->add_field(
-      'node',
-      'nid',
-      'nid'
+.views-spin-carousel-flipper-on,
+.views-spin-carousel-flipper-front-on,
+.views-spin-carousel-flipper-back-on {
+   width: ${panel_width}px !important;
+   height: ${panel_height}px !important;
+}
+EOF;
+   drupal_add_css( $panel_dynamic_css, 'inline' );
+   drupal_add_js(
+      array( 'viewsSpinCarousel' => array( 
+         'panelWidth' => $panel_width,
+         'panelClass' => '.views-spin-carousel-panel',
+         'containerClass' => '.views-spin-carousel-container',
+         'carouselClass' => '.views-spin-carousel',
+         'flipperClass' => '.views-spin-carousel-flipper',
+         'flipperFrontClass' => '.views-spin-carousel-flipper-front',
+         'flipperBackClass' => '.views-spin-carousel-flipper-back',
+         'tiltInc' => $tilt_inc,
+         'tiltZ' => $tilt_z,
+      ) ),
+      'setting'
    );
-   $query->add_field(
-      'node',
-      'created',
-      'created'
+   drupal_add_js(
+      drupal_get_path( 'module', 'views_spin_carousel' ).
+         '/views-spin-carousel.js'
    );
-   $query->add_field(
-      'node',
-      'title',
-      'title'
-   );
-   $query->add_field(
-      'field_data_field_images',
-      'field_images_nid',
-      'field_images'
-   );
-   $query->add_field(
-      'field_data_body',
-      'body_value',
-      'body'
-   );
-   $query->add_field(
-      'field_data_body',
-      'body_summary',
-      'summary'
-   ); */
-   //dpm( $query );
+
+   // Add the carousel faces.
+   $dynamic_css = '';
+   for( $i = 0 ; $i < count( $vars['view']->result ) ; $i++ ) {
+      $tilt_deg = $i * $tilt_inc;
+      $transform_string = 'transform: rotateY( '.$tilt_deg.
+         'deg ) translateZ( '.$tilt_z.'px );';
+      $dynamic_css .= '.views-spin-carousel-panel-on:nth-child('.
+         ($i + 1).') { '.
+            $transform_string.
+            '-moz-'.$transform_string.
+            '-webkit-'.$transform_string.
+            '}';
+   }
+   drupal_add_css( $dynamic_css, 'inline' );
 }
 

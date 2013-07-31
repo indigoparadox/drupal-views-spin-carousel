@@ -1,115 +1,103 @@
 
-var quartzIrisCarouselTheta = 0;
+var viewsSpinCarouselTheta = 0;
 
 jQuery(document).ready( function() {
    if( Modernizr.csstransforms3d ) {
-      // Only activate our fancy carousel if the browser can do 3D.
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.containerClass )
-         .addClass( 'portfolio-carousel-container' );
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass )
-         .addClass( 'portfolio-carousel' );
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.panelClass )
-         .addClass( 'portfolio-carousel-panel' );
-      
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.flipperClass )
-         .addClass( 'portfolio-flipper' );
-         /* .addClass( 'animated flipInX' )
-         .removeClass( 'flipInX animated' ); */
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.flipperFrontClass )
-         .addClass( 'portfolio-flip-front' );
-      jQuery( Drupal.settings.quartzIris.portfolioCarousel.flipperBackClass )
-         .addClass( 'portfolio-flip-back' );
+      var settings = Drupal.settings.viewsSpinCarousel;
 
-      //jQuery( Drupal.settings.quartzIris.portfolioCarousel.containerClass )
-      jQuery( '#content' ).append(
-         '<a href="#" class="portfolio-carousel-link animated flipInX" ' +
-            'id="portfolio-carousel-link-previous" ' +
-            'onClick="return quartzIrisCarouselPrevious()">Previous</a>'
+      // Only activate our fancy carousel if the browser can do 3D.
+      jQuery( settings.containerClass )
+         .addClass( 'views-spin-carousel-container-on' );
+      jQuery( settings.carouselClass )
+         .addClass( 'views-spin-carousel-on' );
+      jQuery( settings.panelClass )
+         .addClass( 'views-spin-carousel-panel-on' );
+      
+      jQuery( settings.flipperClass )
+         .addClass( 'views-spin-carousel-flipper-on' );
+      jQuery( settings.flipperFrontClass )
+         .addClass( 'views-spin-carousel-flipper-front-on' );
+      jQuery( settings.flipperBackClass )
+         .addClass( 'views-spin-carousel-flipper-back-on' );
+
+      jQuery('.views-spin-carousel-degrade').css( 'display', 'none' );
+
+      jQuery('#content').append(
+         '<a href="#" class="views-spin-carousel-link animated flipInX" ' +
+            'id="views-spin-carousel-link-previous" ' +
+            'onClick="return viewsSpinCarouselPrevious()">Previous</a>'
       );
-      jQuery( '#content' ).append(
-         '<a href="#" class="portfolio-carousel-link animated flipInX" ' +
-            'id="portfolio-carousel-link-next" ' +
-            'onClick="return quartzIrisCarouselNext()">Next</a>'
+      jQuery('#content').append(
+         '<a href="#" class="views-spin-carousel-link animated flipInX" ' +
+            'id="views-spin-carousel-link-next" ' +
+            'onClick="return viewsSpinCarouselNext()">Next</a>'
       );
    }
 } );
 
-function quartzIrisCarouselPrevious() {
+function viewsSpinCarouselPrevious() {
    // Calculate the transformation angle.
-   if( 0 > quartzIrisCarouselTheta ) {
-      quartzIrisCarouselTheta = 360;
+   if( 0 > viewsSpinCarouselTheta ) {
+      viewsSpinCarouselTheta = 360;
    } else {
-      quartzIrisCarouselTheta -=
-         Drupal.settings.quartzIris.portfolioCarousel.tiltInc;
+      viewsSpinCarouselTheta -= Drupal.settings.viewsSpinCarousel.tiltInc;
    }
 
    // Apply the transformation.
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   // TODO: Do this by ID rather than class.
+   jQuery( '.views-spin-carousel' ).
       css(
          'transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   jQuery( '.views-spin-carousel' ).
       css(
          '-moz-transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   jQuery( '.views-spin-carousel' ).
       css(
          '-webkit-transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
 
    return false;
 }
 
-function quartzIrisCarouselNext() {
+function viewsSpinCarouselNext() {
    // Calculate the transformation angle.
-   if( 360 < quartzIrisCarouselTheta ) {
-      quartzIrisCarouselTheta = 0;
+   if( 360 < viewsSpinCarouselTheta ) {
+      viewsSpinCarouselTheta = 0;
    } else {
-      quartzIrisCarouselTheta +=
-         Drupal.settings.quartzIris.portfolioCarousel.tiltInc;
+      viewsSpinCarouselTheta += Drupal.settings.viewsSpinCarousel.tiltInc;
    }
 
    // Apply the transformation.
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   jQuery( '.views-spin-carousel' ).
       css(
          'transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   jQuery( '.views-spin-carousel' ).
       css(
          '-moz-transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
-   jQuery( Drupal.settings.quartzIris.portfolioCarousel.carouselClass ).
+   jQuery( '.views-spin-carousel' ).
       css(
          '-webkit-transform',
-         'translateZ( ' + 
-            //Drupal.settings.quartzIris.portfolioCarousel.tiltZ.toString() +
-            '0px ) rotateY( ' +
-            quartzIrisCarouselTheta.toString() +
+         'translateZ( 0px ) rotateY( ' +
+            viewsSpinCarouselTheta.toString() +
             'deg )'
       );
 

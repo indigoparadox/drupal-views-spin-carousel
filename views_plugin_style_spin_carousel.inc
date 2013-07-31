@@ -4,7 +4,7 @@
 
 class views_plugin_style_spin_carousel extends views_plugin_style {
    function options( &$options ) {
-      //$options['front_fields'] = array( 'default' => '' );
+      $options['front_fields'] = array( 'default' => '' );
       $options['flipper_width'] = array( 'default' => 0 );
       $options['flipper_height'] = array( 'default' => 0 );
       $options['auto_timeout'] = array( 'default' => 0 );
@@ -14,20 +14,23 @@ class views_plugin_style_spin_carousel extends views_plugin_style {
 
    function options_form( &$form, &$form_state ) {
 
-      /* $form['front_fields'] = array(
+      $form['front_fields'] = array(
          '#type' => 'textfield',
          '#title' => t( 'Front Fields' ),
          '#description' => t( 'A space-separated list of field machine names. '.
             'The specified fields, if detected in the view, will always '.
             'appear on the front of the flipper. The rest will always appear '.
             'on the back.' ),
-      ); */
+         '#default_value' => $this->options['front_fields'],
+      );
+
+      // TODO: Validate that width/height are numeric.
 
       $form['flipper_width'] = array(
          '#type' => 'textfield',
          '#title' => t( 'Flipper Width' ),
          '#description' => t( 'The width of each flippable item in the '.
-            'carousel. Any CSS value is valid.' ),
+            'carousel.' ),
          '#default_value' => $this->options['flipper_width'],
       );
 
@@ -35,7 +38,7 @@ class views_plugin_style_spin_carousel extends views_plugin_style {
          '#type' => 'textfield',
          '#title' => t( 'Flipper Height' ),
          '#description' => t( 'The height of each flippable item in the '.
-            'carousel. Any CSS value is valid.' ),
+            'carousel.' ),
          '#default_value' => $this->options['flipper_height'],
       );
 
