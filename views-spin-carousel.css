@@ -83,6 +83,18 @@
    position: relative;
 }
 
+.views-spin-carousel-flipper-on:after {
+   background-image: radial-gradient( ellipse closest-side, rgba(0, 0, 0, 0.25 ) 0%, rgba( 0, 0, 0, 0 ) 100% );
+   content: " ";
+   transform: rotateX( 90deg );
+   display: block;
+   position: relative;
+   top: 100%;
+   width: 100%;
+   height: 8vw;
+
+}
+
 .views-spin-carousel-flipper-front-on,
 .views-spin-carousel-flipper-back-on {
    -moz-backface-visibility: hidden;
