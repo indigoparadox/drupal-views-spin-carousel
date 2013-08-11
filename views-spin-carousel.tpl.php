@@ -20,7 +20,20 @@ function views_spin_carousel_render_field( $field_key, $field_config, $row ) {
       echo( '<h3 class="node-title">'.$row->{$field_data_key}.'</h3>' );
    } else {
       $field_data_key = 'field_'.$field_key;
+      if( !empty( $field_config->options['element_wrapper_type'] ) ) {
+         // Add the wrapper element.
+         echo(
+            '<'.$field_config->options['element_wrapper_type'].' class="'.
+            $field_config->options['element_wrapper_class'].'">'
+         );
+      }
       echo( drupal_render( $row->{$field_data_key}[0]['rendered'] ) );
+      if( !empty( $field_config->options['element_wrapper_type'] ) ) {
+         // Add the wrapper element.
+         echo(
+            '</'.$field_config->options['element_wrapper_type'].'>'
+         );
+      }
    }
 }
 
